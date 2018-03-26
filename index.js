@@ -5,9 +5,15 @@ const app = express();
 const chance = new Chance();
 const PORT = 3000;
 
-
-app.get("/", (req, res) => {
-	res.end("coming soon");
+app.get("/:kind", (req, res) => {
+	const kind = req.params.kind || "string";
+	const fn = chance[kind];
+	if (typeof fn === "function") {
+		const str = fn.call(chance);
+		res.status(200).end(str);
+		return;
+	}
+	res.status(404).end("not found");
 });
 
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
+app.listen(PORT, () => console.log(`listening at :${PORT}`));
