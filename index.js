@@ -9,7 +9,7 @@ app.get("/:kind", (req, res) => {
 	const kind = req.params.kind || "string";
 	const fn = chance[kind];
 	if (typeof fn === "function") {
-		const str = fn.call(chance);
+		const str = `${fn.call(chance)}`;
 		res.status(200).end(str);
 		return;
 	}
