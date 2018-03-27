@@ -19,6 +19,10 @@ function handle(req, res) {
 	}
 
 	const q = autoParse(req.query);
+	if (q.length && q.length > 1000) {
+		return res.status(400).end("error: max length is 1000");
+	}
+
 	const val = Reflect.apply(fn, chance, [q]);
 	res.status(200).end(`${val}`);
 }
