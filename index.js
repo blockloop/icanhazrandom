@@ -1,9 +1,8 @@
 const express = require("express");
-const Chance = require("chance");
+const chance = require("chance").Chance();
 const autoParse = require("auto-parse");
 
 const app = express();
-const chance = new Chance();
 const PORT = 3000;
 
 app.get("/:kind", handle);
