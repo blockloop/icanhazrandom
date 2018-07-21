@@ -9,7 +9,9 @@ const PORT = 3000;
 const blacklist = ["unique", "n", "pad", "pick", "pickone", "pickset",
 	"shuffle", "weighted", "nationalities", "capitalize", "get", "locales",
 	"luhn_calculate", "luhn_check", "normal_pool", "provinces",
-	"street_suffixes", "md5",
+	"street_suffixes", "md5", "months", "name_prefixes", "name_suffixes",
+	"countries", "currency_types", "cc_types", "counties", "countries",
+	"states", "timezones", "tlds",
 ];
 
 app.get("/help", help);
