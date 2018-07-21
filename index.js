@@ -1,42 +1,73 @@
 const express = require("express");
-const chance = require("chance").Chance();
+const chance = require("chance").
+	Chance();
 const autoParse = require("auto-parse");
+const words = require("random-words");
 
 const app = express();
 const PORT = 3000;
+const blacklist = ["unique", "n", "pad", "pick", "pickone", "pickset",
+	"shuffle", "weighted", "nationalities", "capitalize", "get", "locales",
+	"luhn_calculate", "luhn_check", "normal_pool", "provinces",
+	"street_suffixes", "md5",
+];
 
 app.get("/help", help);
-app.get("/:kind", handle);
+app.get("/password", password);
 app.get("/", handle);
+
+keys().
+	forEach((key) => app.get(`/${key}`, handle));
 
 app.listen(PORT, () => console.log(`listening at :${PORT}`));
 
 function help(req, res) {
-        let keys = []
-        for (var prop in chance) {
-                keys.push(prop)
-        }
-        keys = keys.
-                filter((k) => (typeof chance[k] === "function")).
-                map((k) => `    /${k}`).
-                join("\n")
-        res.status(200).end(`<pre>available options are:\n${keys}\n</pre>`);
+	const paths = app._router.stack.
+		filter((m) => m.route != null).
+		map((mw) => mw.route.path).
+		sort().
+		map((p) => `    ${p}`).
+		join("\n");
+	res.send(`<pre>Available routes:\n${paths}</pre>`);
+}
+
+function keys() {
+	const props = [];
+	for (const prop in chance) {
+		props.push(prop);
+	}
+	return props.
+		filter((k) => typeof chance[k] === "function").
+		filter((k) => blacklist.indexOf(k) === -1).
+		sort();
+}
+
+function password(req, res) {
+	const w = words({min: 3,
+		max: 6}).
+		join("-").
+		toLowerCase();
+	res.send(w);
 }
 
 function handle(req, res) {
-	const kind = req.params.kind || "string";
+	const kind = req.path.split("/")[1] || "string";
 	const fn = chance[kind];
 	if (typeof fn !== "function") {
-		res.status(404).end("not found");
+		res.status(404).
+			end("not found");
 		return;
 	}
 
 	const q = autoParse(req.query);
 	if (q.length && q.length > 1000) {
-		return res.status(400).end("error: max length is 1000");
+		res.status(400).
+			end("error: max length is 1000");
+		return;
 	}
 
 	const val = Reflect.apply(fn, chance, [q]);
-	res.status(200).end(`${val}`);
+	res.status(200).
+		end(`${val}`);
 }
 
